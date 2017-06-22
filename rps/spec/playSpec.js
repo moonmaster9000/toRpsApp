@@ -1,14 +1,14 @@
 function RPS() {
     this.play = function (p1, p2, ui) {
-        new PlayRequest(p1, p2, ui).execute()
+        new PlayGameRequest(p1, p2, ui).execute()
     }
 }
 
-function PlayRequest(p1, p2, ui) {
+function PlayGameRequest(p1, p2, ui) {
     this.execute = function () {
-        if (invalid(p1) || invalid(p2))
+        if (shapeInvalid(p1) || shapeInvalid(p2))
             ui.invalid()
-        else if (tie())
+        else if (draw())
             ui.tie()
         else if (p1BeatsP2())
             ui.p1Wins()
@@ -18,11 +18,11 @@ function PlayRequest(p1, p2, ui) {
 
     const validThrows = ["rock", "paper", "scissors"]
 
-    function invalid(theThrow) {
+    function shapeInvalid(theThrow) {
         return !validThrows.includes(theThrow)
     }
 
-    function tie() {
+    function draw() {
         return p1 === p2
     }
 
