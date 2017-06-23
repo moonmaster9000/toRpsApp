@@ -1,29 +1,3 @@
-/**
-
- Game
- Rounds
- Players
- p1
- p2
-
- Throws
-     Rock
-     Paper
-     Scissors
-
- Round Result
-
- winner, tie, invalid
-
- Department
- Cheating
-
- Leaderboard
-
- App
-
- */
-
 function RPS() {
     this.playRound = function (p1Throw, p2Throw, ui) {
         new PlayRoundRequest(p1Throw, p2Throw, ui).execute()
