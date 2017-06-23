@@ -1,9 +1,9 @@
-function RPS() {
-    this.playRound = function (p1Throw, p2Throw, ui, roundRepo) {
+function RPS(roundRepo) {
+    this.playRound = function (p1Throw, p2Throw, ui) {
         new PlayRoundRequest(p1Throw, p2Throw, ui, roundRepo).execute()
     }
 
-    this.history = function(ui, roundRepo){
+    this.history = function(ui){
         if (roundRepo.isEmpty()){
             ui.noRounds()
         } else {
@@ -23,15 +23,13 @@ function Round(p1Throw, p2Throw, result){
 function PlayRoundRequest(p1Throw, p2Throw, ui, roundRepo) {
     this.execute = function () {
         if (throwInvalid(p1Throw) || throwInvalid(p2Throw))
-            ui.invalid()
+            handleInvalid()
         else if (tie())
-            ui.tie()
-        else if (p1Wins()){
-            roundRepo.save(new Round(p1Throw, p2Throw, "p1"))
-            ui.p1Wins()
-        }
+            handleTie()
+        else if (p1Wins())
+            handleP1Wins()
         else
-            ui.p2Wins()
+            handleP2Wins()
     }
 
     const validThrows = ["rock", "paper", "scissors"]
@@ -48,6 +46,30 @@ function PlayRoundRequest(p1Throw, p2Throw, ui, roundRepo) {
         return p1Throw === "rock" && p2Throw === "scissors" ||
             p1Throw === "scissors" && p2Throw === "paper" ||
             p1Throw === "paper" && p2Throw === "rock"
+    }
+
+    function save(result) {
+        roundRepo.save(new Round(p1Throw, p2Throw, result))
+    }
+
+    function handleInvalid() {
+        save("invalid")
+        ui.invalid()
+    }
+
+    function handleTie() {
+        save("tie")
+        ui.tie()
+    }
+
+    function handleP1Wins() {
+        save("p1")
+        ui.p1Wins()
+    }
+
+    function handleP2Wins() {
+        save("p2")
+        ui.p2Wins()
     }
 }
 
