@@ -1,12 +1,25 @@
 const React = require("react")
 const ReactDOM = require("react-dom")
 const ReactTestUtils = require("react-dom/test-utils")
+const { Round } = require("rps")
 
 class PlayForm extends React.Component {
     constructor(){
         super()
 
         this.state = {}
+    }
+
+    componentDidMount(){
+        this.props.rps.history(this)
+    }
+
+    noRounds(){
+        this.setState({ history: "NO ROUNDS"})
+    }
+
+    rounds(rs){
+        this.setState({history: rs.map(r => `${r.p1Throw} ${r.p2Throw} ${r.result}`)})
     }
 
     handleClick(){
@@ -39,6 +52,8 @@ class PlayForm extends React.Component {
             <input type="text" name="p1Throw" onChange={this.inputChanged.bind(this)}/>
             <input type="text" name="p2Throw" onChange={this.inputChanged.bind(this)}/>
             <button onClick={this.handleClick.bind(this)}>PLAY</button>
+
+            {this.state.history}
         </div>
     }
 }
@@ -123,6 +138,36 @@ describe("play form", function () {
         expect(playSpy).toHaveBeenCalledWith("p1 Throw", "p2 Throw", jasmine.any(Object))
     })
 
+    describe("when the rps module says there are no rounds", function () {
+        beforeEach(function () {
+            mountApp({
+                history: function(ui){
+                    ui.noRounds()
+                }
+            })
+        })
+
+        it("displays NO ROUNDS", function () {
+            expect(page()).toContain("NO ROUNDS")
+        })
+    })
+
+    describe("when the rps module says there are rounds", function () {
+        beforeEach(function () {
+            mountApp({
+                history: function(ui){
+                    ui.rounds([
+                        new Round("foo", "bar", "baz")
+                    ])
+                }
+            })
+        })
+
+        it("displays the rounds", function () {
+            expect(page()).toContain("foo", "bar", "baz")
+        })
+    })
+
     function fillIn(inputName, inputValue) {
         let input = document.querySelector(`input[name='${inputName}']`)
         input.value = inputValue
@@ -146,6 +191,7 @@ describe("play form", function () {
     })
 
     function mountApp(rps) {
+        rps.history = rps.history || function(){}
         ReactDOM.render(
             <PlayForm rps={rps}/>,
             domFixture
@@ -153,7 +199,7 @@ describe("play form", function () {
     }
 
     function page() {
-        return domFixture.innerText;
+        return domFixture.innerText
     }
 
     function submitPlayForm() {
