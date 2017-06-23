@@ -1,17 +1,35 @@
 function RPS() {
-    this.playRound = function (p1Throw, p2Throw, ui) {
-        new PlayRoundRequest(p1Throw, p2Throw, ui).execute()
+    this.playRound = function (p1Throw, p2Throw, ui, roundRepo) {
+        new PlayRoundRequest(p1Throw, p2Throw, ui, roundRepo).execute()
+    }
+
+    this.history = function(ui, roundRepo){
+        if (roundRepo.isEmpty()){
+            ui.noRounds()
+        } else {
+            ui.rounds(roundRepo.getAll())
+        }
     }
 }
 
-function PlayRoundRequest(p1Throw, p2Throw, ui) {
+function Round(p1Throw, p2Throw, result){
+    this.p1Throw = p1Throw
+    this.p2Throw = p2Throw
+    this.result = result
+}
+
+
+
+function PlayRoundRequest(p1Throw, p2Throw, ui, roundRepo) {
     this.execute = function () {
         if (throwInvalid(p1Throw) || throwInvalid(p2Throw))
             ui.invalid()
         else if (tie())
             ui.tie()
-        else if (p1Wins())
+        else if (p1Wins()){
+            roundRepo.save(new Round(p1Throw, p2Throw, "p1"))
             ui.p1Wins()
+        }
         else
             ui.p2Wins()
     }
@@ -33,4 +51,4 @@ function PlayRoundRequest(p1Throw, p2Throw, ui) {
     }
 }
 
-module.exports = { RPS }
+module.exports = { RPS, Round }
